@@ -1,24 +1,35 @@
 package de.hwr.docuremind;
 
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class SettingsActivity extends AppCompatActivity {
+
+    private RadioButton radio30;
+    private Button buttonSaveSettings;
+    private Button buttonBackSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_settings);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        radio30 = findViewById(R.id.radio30);
+        buttonSaveSettings = findViewById(R.id.buttonSaveSettings);
+        buttonBackSettings = findViewById(R.id.buttonBackSettings);
+
+        radio30.setChecked(true);
+
+        buttonSaveSettings.setOnClickListener(view -> {
+            Toast.makeText(SettingsActivity.this, "Einstellungen werden später gespeichert", Toast.LENGTH_SHORT).show();
+        });
+
+        buttonBackSettings.setOnClickListener(view -> {
+            finish();
         });
     }
 }

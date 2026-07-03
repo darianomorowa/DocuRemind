@@ -1,24 +1,30 @@
 package de.hwr.docuremind;
 
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class AddDocumentActivity extends AppCompatActivity {
+
+    private Button buttonSaveDocument;
+    private Button buttonBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_document);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        buttonSaveDocument = findViewById(R.id.buttonSaveDocument);
+        buttonBack = findViewById(R.id.buttonBack);
+
+        buttonSaveDocument.setOnClickListener(view -> {
+            Toast.makeText(AddDocumentActivity.this, "Speichern folgt mit Firebase", Toast.LENGTH_SHORT).show();
+        });
+
+        buttonBack.setOnClickListener(view -> {
+            finish();
         });
     }
 }

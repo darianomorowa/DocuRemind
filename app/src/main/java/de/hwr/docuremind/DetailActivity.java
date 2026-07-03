@@ -1,24 +1,51 @@
 package de.hwr.docuremind;
 
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class DetailActivity extends AppCompatActivity {
+
+    private TextView textDocumentName;
+    private TextView textDocumentCategory;
+    private TextView textDocumentDate;
+    private Button buttonEdit;
+    private Button buttonDelete;
+    private Button buttonBackDetail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_detail);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        textDocumentName = findViewById(R.id.textDocumentName);
+        textDocumentCategory = findViewById(R.id.textDocumentCategory);
+        textDocumentDate = findViewById(R.id.textDocumentDate);
+        buttonEdit = findViewById(R.id.buttonEdit);
+        buttonDelete = findViewById(R.id.buttonDelete);
+        buttonBackDetail = findViewById(R.id.buttonBackDetail);
+
+        String name = getIntent().getStringExtra("documentName");
+        String category = getIntent().getStringExtra("documentCategory");
+        String date = getIntent().getStringExtra("documentDate");
+
+        textDocumentName.setText("Name: " + name);
+        textDocumentCategory.setText("Kategorie: " + category);
+        textDocumentDate.setText("Ablaufdatum: " + date);
+
+        buttonEdit.setOnClickListener(view -> {
+            Toast.makeText(DetailActivity.this, "Bearbeiten folgt später", Toast.LENGTH_SHORT).show();
+        });
+
+        buttonDelete.setOnClickListener(view -> {
+            Toast.makeText(DetailActivity.this, "Löschen folgt später", Toast.LENGTH_SHORT).show();
+        });
+
+        buttonBackDetail.setOnClickListener(view -> {
+            finish();
         });
     }
 }

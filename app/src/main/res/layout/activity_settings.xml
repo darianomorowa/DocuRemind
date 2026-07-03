@@ -1,10 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingsActivity">
+    android:orientation="vertical"
+    android:padding="24dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Einstellungen"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Erinnerung vor Ablauf"
+        android:textSize="18sp"
+        android:layout_marginBottom="12dp" />
+
+    <RadioGroup
+        android:id="@+id/radioReminderGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/radio30"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="30 Tage vorher" />
+
+        <RadioButton
+            android:id="@+id/radio60"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="60 Tage vorher" />
+
+        <RadioButton
+            android:id="@+id/radio90"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="90 Tage vorher" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/buttonSaveSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Einstellungen speichern"
+        android:layout_marginTop="24dp" />
+
+    <Button
+        android:id="@+id/buttonBackSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Zurück"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

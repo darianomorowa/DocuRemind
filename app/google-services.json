@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "65841777650",
+    "project_id": "docuremind-hwr",
+    "storage_bucket": "docuremind-hwr.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:65841777650:android:c3d44dde0b2c60577eb96b",
+        "android_client_info": {
+          "package_name": "de.hwr.docuremind"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi0B6dbpVFm4qaHVTXtSMDgW43hZt-4B4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

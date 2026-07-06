@@ -1,48 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textDashboardTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Dashboard"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
-
-    <TextView
-        android:id="@+id/textDashboardSubtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Deine gespeicherten Dokumente"
-        android:textSize="16sp"
-        android:layout_marginBottom="24dp" />
-
-    <Button
-        android:id="@+id/buttonAddDocument"
+    <LinearLayout
+        android:id="@+id/layoutDashboardContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Dokument hinzufügen" />
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <Button
-        android:id="@+id/buttonSettings"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Einstellungen"
-        android:layout_marginTop="8dp" />
+        <TextView
+            android:id="@+id/textDashboardTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dashboard"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
 
-    <TextView
-        android:id="@+id/textExampleDocument"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Beispiel: Reisepass läuft bald ab"
-        android:textSize="18sp"
-        android:padding="16dp"
-        android:layout_marginTop="32dp"
-        android:background="#EEEEEE" />
+        <TextView
+            android:id="@+id/textDashboardSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Deine gespeicherten Dokumente"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/buttonAddDocument"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dokument hinzufügen" />
+
+        <Button
+            android:id="@+id/buttonSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Einstellungen"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/buttonLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ausloggen"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/textDocumentListTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dokumente"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="12dp" />
+
+        <LinearLayout
+            android:id="@+id/layoutDocumentList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </LinearLayout>
+</ScrollView>

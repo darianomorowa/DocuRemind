@@ -26,6 +26,9 @@ public class AddDocumentActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firestore;
 
+    private String documentId;
+    private boolean isEditMode = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,9 +44,31 @@ public class AddDocumentActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
+        checkEditMode();
+
         buttonSaveDocument.setOnClickListener(view -> saveDocument());
 
         buttonBack.setOnClickListener(view -> finish());
+    }
+
+    private void checkEditMode() {
+        documentId = getIntent().getStringExtra("documentId");
+
+        if (documentId != null) {
+            isEditMode = true;
+
+            String name = getIntent().getStringExtra("documentName");
+            String category = getIntent().getStringExtra("documentCategory");
+            String expiryDate = getIntent().getStringExtra("documentDate");
+            String note = getIntent().getStringExtra("documentNote");
+
+            editDocumentName.setText(name);
+            editCategory.setText(category);
+            editExpiryDate.setText(expiryDate);
+            editNote.setText(note);
+
+            buttonSaveDocument.setText("Änderungen speichern");
+        }
     }
 
     private void saveDocument() {
@@ -68,6 +93,16 @@ public class AddDocumentActivity extends AppCompatActivity {
         document.put("category", category);
         document.put("expiryDate", expiryDate);
         document.put("note", note);
+        document.put("updatedAt", System.currentTimeMillis());
+
+        if (isEditMode) {
+            updateDocument(userId, document);
+        } else {
+            createDocument(userId, document);
+        }
+    }
+
+    private void createDocument(String userId, Map<String, Object> document) {
         document.put("createdAt", System.currentTimeMillis());
 
         firestore.collection("users")
@@ -79,7 +114,30 @@ public class AddDocumentActivity extends AppCompatActivity {
                     finish();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(AddDocumentActivity.this, "Fehler beim Speichern: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(
+                            AddDocumentActivity.this,
+                            "Fehler beim Speichern: " + e.getMessage(),
+                            Toast.LENGTH_LONG
+                    ).show();
+                });
+    }
+
+    private void updateDocument(String userId, Map<String, Object> document) {
+        firestore.collection("users")
+                .document(userId)
+                .collection("documents")
+                .document(documentId)
+                .update(document)
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(AddDocumentActivity.this, "Dokument aktualisiert", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(
+                            AddDocumentActivity.this,
+                            "Fehler beim Aktualisieren: " + e.getMessage(),
+                            Toast.LENGTH_LONG
+                    ).show();
                 });
     }
 

@@ -101,7 +101,7 @@ public class DashboardActivity extends AppCompatActivity {
         ReminderScheduler.updateSchedule(this);
 
         /*
-         * Navigation zu den weiteren Activities.
+         * Navigation zum Dokumentformular.
          */
         buttonAddDocument.setOnClickListener(view -> {
             Intent intent = new Intent(
@@ -112,6 +112,9 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        /*
+         * Navigation zu den Einstellungen.
+         */
         buttonSettings.setOnClickListener(view -> {
             Intent intent = new Intent(
                     DashboardActivity.this,
@@ -121,13 +124,16 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        /*
+         * Aktuellen Nutzer abmelden.
+         */
         buttonLogout.setOnClickListener(
                 view -> logoutUser()
         );
     }
 
     /*
-     * Prüft bei jedem Öffnen des Dashboards,
+     * Prüft beim Öffnen des Dashboards,
      * ob weiterhin ein Nutzer angemeldet ist.
      */
     @Override
@@ -140,52 +146,55 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     /*
-     * onResume wird jedes Mal ausgeführt, wenn das Dashboard sichtbar wird.
+     * onResume wird jedes Mal ausgeführt,
+     * wenn das Dashboard wieder sichtbar wird.
      *
-     * Dadurch wird die Liste nach dem Hinzufügen, Bearbeiten oder Löschen
-     * automatisch neu aus Firestore geladen.
+     * Dadurch wird die Dokumentliste nach dem Hinzufügen,
+     * Bearbeiten oder Löschen automatisch neu geladen.
      */
     @Override
     protected void onResume() {
         super.onResume();
-        loadDocuments();
 
         if (firebaseAuth.getCurrentUser() != null) {
             loadDocuments();
+        }
     }
 
-        /*
-         * Meldet den Nutzer bei Firebase ab
-         * und öffnet anschließend den Login-Screen.
-         */
-        private void logoutUser() {
-            firebaseAuth.signOut();
-            openLoginScreen();
-        }
-
-        /*
-         * Öffnet den Login-Screen und entfernt alle bisherigen
-         * Activities aus dem Navigationsverlauf.
-         */
-        private void openLoginScreen() {
-            Intent intent = new Intent(
-                    DashboardActivity.this,
-                    MainActivity.class
-            );
-
-            intent.addFlags(
-                    Intent.FLAG_ACTIVITY_NEW_TASK
-                            | Intent.FLAG_ACTIVITY_CLEAR_TASK
-            );
-
-            startActivity(intent);
-            finish();
-        }
+    /*
+     * Meldet den Nutzer bei Firebase ab
+     * und öffnet anschließend den Login-Screen.
+     */
+    private void logoutUser() {
+        firebaseAuth.signOut();
+        openLoginScreen();
+    }
 
     /*
-     * Lädt alle Dokumente des aktuell angemeldeten Nutzers aus Firestore.
+     * Öffnet den Login-Screen und entfernt alle bisherigen
+     * Activities aus dem Navigationsverlauf.
+     */
+    private void openLoginScreen() {
+        Intent intent = new Intent(
+                DashboardActivity.this,
+                MainActivity.class
+        );
+
+        intent.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
+        );
+
+        startActivity(intent);
+        finish();
+    }
+
+    /*
+     * Lädt alle Dokumente des aktuell angemeldeten Nutzers
+     * aus Firestore.
      */
     private void loadDocuments() {
+
         /*
          * Alte Karten entfernen und Ladeanzeige starten.
          */
@@ -193,6 +202,9 @@ public class DashboardActivity extends AppCompatActivity {
         textEmptyState.setVisibility(View.GONE);
         progressDocuments.setVisibility(View.VISIBLE);
 
+        /*
+         * Ohne angemeldeten Nutzer darf keine Firestore-Abfrage erfolgen.
+         */
         if (firebaseAuth.getCurrentUser() == null) {
             progressDocuments.setVisibility(View.GONE);
 
@@ -210,6 +222,9 @@ public class DashboardActivity extends AppCompatActivity {
                         .getCurrentUser()
                         .getUid();
 
+        /*
+         * Dokumente aus der persönlichen Unterkollektion laden.
+         */
         firestore.collection("users")
                 .document(userId)
                 .collection("documents")
@@ -234,7 +249,7 @@ public class DashboardActivity extends AppCompatActivity {
 
                     /*
                      * Dokumente nach ihrem Ablaufdatum sortieren.
-                     * Die früheste Frist soll oben erscheinen.
+                     * Die früheste Frist erscheint zuerst.
                      */
                     documents.sort((first, second) -> {
 
@@ -276,8 +291,8 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     /*
-     * Aktualisiert die Dokumentanzahl und erzeugt für jedes Dokument
-     * eine eigene Karte.
+     * Aktualisiert die Dokumentanzahl und erzeugt
+     * für jedes Dokument eine eigene Karte.
      */
     private void showDocuments(
             List<QueryDocumentSnapshot> documents
@@ -295,7 +310,7 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         /*
-         * Bei einer leeren Liste wird statt Karten ein Hinweis angezeigt.
+         * Bei einer leeren Liste wird ein Hinweis angezeigt.
          */
         if (documents.isEmpty()) {
             textEmptyState.setText(
@@ -320,10 +335,8 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     /*
-     * Erstellt eine sichtbare Dokumentkarte aus item_document.xml.
-     *
-     * Beim Anklicken werden alle Dokumentdaten an die DetailActivity
-     * übergeben.
+     * Erstellt eine sichtbare Dokumentkarte
+     * aus item_document.xml.
      */
     private void addDocumentCard(
             QueryDocumentSnapshot snapshot
@@ -363,17 +376,26 @@ public class DashboardActivity extends AppCompatActivity {
         /*
          * Werte aus dem Firestore-Dokument auslesen.
          */
-        String documentId = snapshot.getId();
-        String name = snapshot.getString("name");
-        String category = snapshot.getString("category");
-        String expiryDate = snapshot.getString("expiryDate");
-        String note = snapshot.getString("note");
+        String documentId =
+                snapshot.getId();
+
+        String name =
+                snapshot.getString("name");
+
+        String category =
+                snapshot.getString("category");
+
+        String expiryDate =
+                snapshot.getString("expiryDate");
+
+        String note =
+                snapshot.getString("note");
 
         long expiryDateMillis =
                 readExpiryDateMillis(snapshot);
 
         /*
-         * Fallback-Werte verhindern leere oder unverständliche Karten.
+         * Fallback-Werte verhindern leere Karten.
          */
         if (TextUtils.isEmpty(name)) {
             name = "Unbenanntes Dokument";
@@ -421,7 +443,7 @@ public class DashboardActivity extends AppCompatActivity {
                 );
 
         /*
-         * Berechnete Werte in der Karte anzeigen.
+         * Dokumentinformationen in der Karte anzeigen.
          */
         textItemName.setText(name);
         textItemStatus.setText(statusText);
@@ -435,7 +457,7 @@ public class DashboardActivity extends AppCompatActivity {
         );
 
         /*
-         * Hintergrund des Statusfeldes entsprechend der Dringlichkeit färben.
+         * Statusfeld entsprechend der Dringlichkeit färben.
          */
         Drawable statusBackground =
                 textItemStatus.getBackground();
@@ -466,7 +488,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         /*
          * Beim Klick öffnet sich die Detailansicht.
-         * Die Daten werden als Intent-Extras übergeben.
+         * Die Dokumentdaten werden als Intent-Extras übergeben.
          */
         cardDocument.setOnClickListener(view -> {
             Intent intent = new Intent(
@@ -508,7 +530,7 @@ public class DashboardActivity extends AppCompatActivity {
         });
 
         /*
-         * Die fertige Karte wird unten an die Dokumentliste angehängt.
+         * Die fertige Karte wird an die Dokumentliste angehängt.
          */
         layoutDocumentList.addView(itemView);
     }
@@ -516,7 +538,7 @@ public class DashboardActivity extends AppCompatActivity {
     /*
      * Liest den neuen Zeitstempel aus Firestore.
      *
-     * Bei älteren Dokumenten ohne Zeitstempel wird stattdessen
+     * Bei älteren Dokumenten ohne Zeitstempel wird
      * das gespeicherte Textdatum umgewandelt.
      */
     private long readExpiryDateMillis(
@@ -538,8 +560,7 @@ public class DashboardActivity extends AppCompatActivity {
     /*
      * Liefert den Wert für die Sortierung.
      *
-     * Dokumente ohne gültiges Datum erhalten Long.MAX_VALUE
-     * und erscheinen dadurch am Ende der Liste.
+     * Dokumente ohne gültiges Datum erscheinen am Ende.
      */
     private long getSortValue(
             QueryDocumentSnapshot snapshot

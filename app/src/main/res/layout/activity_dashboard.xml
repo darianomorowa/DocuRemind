@@ -1,67 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
+<!--
+    Das gesamte Dashboard ist scrollbar, falls viele Dokumente vorhanden sind.
+-->
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/docu_background"
+    android:fillViewport="true">
+
+    <!-- Hauptcontainer des Dashboards -->
     <LinearLayout
-        android:id="@+id/layoutDashboardContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="20dp">
 
+        <!-- Markenname -->
         <TextView
-            android:id="@+id/textDashboardTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Dashboard"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:text="DocuRemind"
+            android:textColor="@color/docu_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
+        <!-- Hauptüberschrift -->
         <TextView
-            android:id="@+id/textDashboardSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Deine gespeicherten Dokumente"
-            android:textSize="16sp"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginTop="5dp"
+            android:text="Deine Fristen im Blick"
+            android:textColor="@color/docu_text_primary"
+            android:textSize="29sp"
+            android:textStyle="bold" />
 
-        <Button
+        <!-- Kurze Beschreibung -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:text="Verwalte Dokumente und erkenne rechtzeitig, was als Nächstes fällig wird."
+            android:textColor="@color/docu_text_secondary"
+            android:textSize="15sp" />
+
+        <!-- Primäre Aktion zum Erstellen eines Dokuments -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonAddDocument"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Dokument hinzufügen" />
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/docu_primary"
+            android:text="Neues Dokument hinzufügen"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            app:cornerRadius="15dp" />
 
-        <Button
-            android:id="@+id/buttonSettings"
+        <!-- Zeile mit Einstellungen und Logout -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Einstellungen"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/buttonLogout"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonSettings"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/docu_surface"
+                android:text="Einstellungen"
+                android:textAllCaps="false"
+                android:textColor="@color/docu_primary"
+                app:cornerRadius="14dp"
+                app:strokeColor="@color/docu_border"
+                app:strokeWidth="1dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonLogout"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="5dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/docu_surface"
+                android:text="Ausloggen"
+                android:textAllCaps="false"
+                android:textColor="@color/docu_text_secondary"
+                app:cornerRadius="14dp"
+                app:strokeColor="@color/docu_border"
+                app:strokeWidth="1dp" />
+
+        </LinearLayout>
+
+        <!-- Überschrift und Anzahl der Dokumente -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ausloggen"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="30dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/textDocumentListTitle"
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Meine Dokumente"
+                android:textColor="@color/docu_text_primary"
+                android:textSize="21sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textDocumentCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 Dokumente"
+                android:textColor="@color/docu_text_secondary"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <!-- Wird während des Ladens der Firestore-Daten angezeigt -->
+        <ProgressBar
+            android:id="@+id/progressDocuments"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Dokumente"
-            android:textSize="22sp"
-            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="32dp"
-            android:layout_marginBottom="12dp" />
+            android:indeterminateTint="@color/docu_primary"
+            android:visibility="gone" />
 
+        <!-- Wird angezeigt, wenn keine Dokumente vorhanden sind -->
+        <TextView
+            android:id="@+id/textEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@color/docu_surface"
+            android:gravity="center"
+            android:padding="28dp"
+            android:text="Noch keine Dokumente gespeichert."
+            android:textColor="@color/docu_text_secondary"
+            android:textSize="15sp"
+            android:visibility="gone" />
+
+        <!--
+            In diesen Container fügt Java für jedes Dokument
+            eine eigene item_document-Karte ein.
+        -->
         <LinearLayout
             android:id="@+id/layoutDocumentList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:orientation="vertical" />
 
     </LinearLayout>
+
 </ScrollView>

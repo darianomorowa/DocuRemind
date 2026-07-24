@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
-    
+
     <!--
     Ab Android 13 muss der Nutzer Benachrichtigungen ausdrücklich erlauben.
 -->

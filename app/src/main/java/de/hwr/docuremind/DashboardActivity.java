@@ -1,27 +1,45 @@
 package de.hwr.docuremind;
 
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.ViewGroup;
+import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DashboardActivity extends AppCompatActivity {
 
+    /*
+     * Bedienelemente und Anzeigeflächen des Dashboards.
+     */
     private Button buttonAddDocument;
     private Button buttonSettings;
     private Button buttonLogout;
+
+    private TextView textDocumentCount;
+    private TextView textEmptyState;
+    private ProgressBar progressDocuments;
     private LinearLayout layoutDocumentList;
 
+    /*
+     * FirebaseAuth liefert den aktuellen Nutzer.
+     * Firestore lädt seine gespeicherten Dokumente.
+     */
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firestore;
 
@@ -30,126 +48,465 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        buttonAddDocument = findViewById(R.id.buttonAddDocument);
-        buttonSettings = findViewById(R.id.buttonSettings);
-        buttonLogout = findViewById(R.id.buttonLogout);
-        layoutDocumentList = findViewById(R.id.layoutDocumentList);
+        /*
+         * XML-Elemente mit dem Java-Code verbinden.
+         */
+        buttonAddDocument =
+                findViewById(R.id.buttonAddDocument);
 
+        buttonSettings =
+                findViewById(R.id.buttonSettings);
+
+        buttonLogout =
+                findViewById(R.id.buttonLogout);
+
+        textDocumentCount =
+                findViewById(R.id.textDocumentCount);
+
+        textEmptyState =
+                findViewById(R.id.textEmptyState);
+
+        progressDocuments =
+                findViewById(R.id.progressDocuments);
+
+        layoutDocumentList =
+                findViewById(R.id.layoutDocumentList);
+
+        /*
+         * Firebase-Dienste initialisieren.
+         */
         firebaseAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
+        /*
+         * Navigation zu den weiteren Activities.
+         */
         buttonAddDocument.setOnClickListener(view -> {
-            Intent intent = new Intent(DashboardActivity.this, AddDocumentActivity.class);
+            Intent intent = new Intent(
+                    DashboardActivity.this,
+                    AddDocumentActivity.class
+            );
+
             startActivity(intent);
         });
 
         buttonSettings.setOnClickListener(view -> {
-            Intent intent = new Intent(DashboardActivity.this, SettingsActivity.class);
+            Intent intent = new Intent(
+                    DashboardActivity.this,
+                    SettingsActivity.class
+            );
+
             startActivity(intent);
         });
 
-        buttonLogout.setOnClickListener(view -> {
-            firebaseAuth.signOut();
-            Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        loadDocuments();
+        buttonLogout.setOnClickListener(
+                view -> logoutUser()
+        );
     }
 
+    /*
+     * onResume wird jedes Mal ausgeführt, wenn das Dashboard sichtbar wird.
+     *
+     * Dadurch wird die Liste nach dem Hinzufügen, Bearbeiten oder Löschen
+     * automatisch neu aus Firestore geladen.
+     */
     @Override
     protected void onResume() {
         super.onResume();
         loadDocuments();
     }
 
+    /*
+     * Meldet den Nutzer bei Firebase ab und öffnet den Login-Screen.
+     *
+     * Der bisherige Activity-Stack wird gelöscht, damit der Nutzer nicht
+     * über den Zurück-Button wieder ins Dashboard gelangt.
+     */
+    private void logoutUser() {
+        firebaseAuth.signOut();
+
+        Intent intent = new Intent(
+                DashboardActivity.this,
+                MainActivity.class
+        );
+
+        intent.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
+        );
+
+        startActivity(intent);
+    }
+
+    /*
+     * Lädt alle Dokumente des aktuell angemeldeten Nutzers aus Firestore.
+     */
     private void loadDocuments() {
+        /*
+         * Alte Karten entfernen und Ladeanzeige starten.
+         */
         layoutDocumentList.removeAllViews();
+        textEmptyState.setVisibility(View.GONE);
+        progressDocuments.setVisibility(View.VISIBLE);
 
         if (firebaseAuth.getCurrentUser() == null) {
-            Toast.makeText(this, "Kein Nutzer eingeloggt", Toast.LENGTH_SHORT).show();
+            progressDocuments.setVisibility(View.GONE);
+
+            Toast.makeText(
+                    this,
+                    "Kein Nutzer eingeloggt",
+                    Toast.LENGTH_SHORT
+            ).show();
+
             return;
         }
 
-        String userId = firebaseAuth.getCurrentUser().getUid();
+        String userId =
+                firebaseAuth
+                        .getCurrentUser()
+                        .getUid();
 
         firestore.collection("users")
                 .document(userId)
                 .collection("documents")
-                .orderBy("createdAt")
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots.isEmpty()) {
-                        showEmptyMessage();
-                        return;
+                .addOnSuccessListener(querySnapshots -> {
+
+                    progressDocuments.setVisibility(
+                            View.GONE
+                    );
+
+                    /*
+                     * Firestore-Ergebnisse in eine bearbeitbare Liste übernehmen.
+                     */
+                    List<QueryDocumentSnapshot> documents =
+                            new ArrayList<>();
+
+                    for (QueryDocumentSnapshot snapshot
+                            : querySnapshots) {
+
+                        documents.add(snapshot);
                     }
 
-                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                        String documentId = documentSnapshot.getId();
-                        String name = documentSnapshot.getString("name");
-                        String category = documentSnapshot.getString("category");
-                        String expiryDate = documentSnapshot.getString("expiryDate");
-                        String note = documentSnapshot.getString("note");
+                    /*
+                     * Dokumente nach ihrem Ablaufdatum sortieren.
+                     * Die früheste Frist soll oben erscheinen.
+                     */
+                    documents.sort((first, second) -> {
 
-                        addDocumentView(documentId, name, category, expiryDate, note);
-                    }
+                        long firstDate =
+                                getSortValue(first);
+
+                        long secondDate =
+                                getSortValue(second);
+
+                        return Long.compare(
+                                firstDate,
+                                secondDate
+                        );
+                    });
+
+                    showDocuments(documents);
                 })
-                .addOnFailureListener(e -> {
+                .addOnFailureListener(exception -> {
+
+                    progressDocuments.setVisibility(
+                            View.GONE
+                    );
+
+                    textEmptyState.setText(
+                            "Dokumente konnten nicht geladen werden."
+                    );
+
+                    textEmptyState.setVisibility(
+                            View.VISIBLE
+                    );
+
                     Toast.makeText(
                             DashboardActivity.this,
-                            "Fehler beim Laden: " + e.getMessage(),
+                            "Fehler beim Laden: "
+                                    + exception.getMessage(),
                             Toast.LENGTH_LONG
                     ).show();
                 });
     }
 
-    private void showEmptyMessage() {
-        TextView emptyText = new TextView(this);
-        emptyText.setText("Noch keine Dokumente gespeichert.");
-        emptyText.setTextSize(16);
-        emptyText.setPadding(16, 16, 16, 16);
+    /*
+     * Aktualisiert die Dokumentanzahl und erzeugt für jedes Dokument
+     * eine eigene Karte.
+     */
+    private void showDocuments(
+            List<QueryDocumentSnapshot> documents
+    ) {
+        int documentCount = documents.size();
 
-        layoutDocumentList.addView(emptyText);
+        if (documentCount == 1) {
+            textDocumentCount.setText(
+                    "1 Dokument"
+            );
+        } else {
+            textDocumentCount.setText(
+                    documentCount + " Dokumente"
+            );
+        }
+
+        /*
+         * Bei einer leeren Liste wird statt Karten ein Hinweis angezeigt.
+         */
+        if (documents.isEmpty()) {
+            textEmptyState.setText(
+                    "Noch keine Dokumente gespeichert."
+            );
+
+            textEmptyState.setVisibility(
+                    View.VISIBLE
+            );
+
+            return;
+        }
+
+        /*
+         * Für jedes Firestore-Dokument wird eine Karte erzeugt.
+         */
+        for (QueryDocumentSnapshot snapshot
+                : documents) {
+
+            addDocumentCard(snapshot);
+        }
     }
 
-    private void addDocumentView(
-            String documentId,
-            String name,
-            String category,
-            String expiryDate,
-            String note
+    /*
+     * Erstellt eine sichtbare Dokumentkarte aus item_document.xml.
+     *
+     * Beim Anklicken werden alle Dokumentdaten an die DetailActivity
+     * übergeben.
+     */
+    private void addDocumentCard(
+            QueryDocumentSnapshot snapshot
     ) {
-        TextView documentView = new TextView(this);
+        View itemView =
+                getLayoutInflater().inflate(
+                        R.layout.item_document,
+                        layoutDocumentList,
+                        false
+                );
 
-        documentView.setText(
-                "Name: " + name + "\n" +
-                        "Kategorie: " + category + "\n" +
-                        "Ablaufdatum: " + expiryDate
+        MaterialCardView cardDocument =
+                itemView.findViewById(
+                        R.id.cardDocument
+                );
+
+        TextView textItemName =
+                itemView.findViewById(
+                        R.id.textItemName
+                );
+
+        TextView textItemStatus =
+                itemView.findViewById(
+                        R.id.textItemStatus
+                );
+
+        TextView textItemCategory =
+                itemView.findViewById(
+                        R.id.textItemCategory
+                );
+
+        TextView textItemDate =
+                itemView.findViewById(
+                        R.id.textItemDate
+                );
+
+        /*
+         * Werte aus dem Firestore-Dokument auslesen.
+         */
+        String documentId = snapshot.getId();
+        String name = snapshot.getString("name");
+        String category = snapshot.getString("category");
+        String expiryDate = snapshot.getString("expiryDate");
+        String note = snapshot.getString("note");
+
+        long expiryDateMillis =
+                readExpiryDateMillis(snapshot);
+
+        /*
+         * Fallback-Werte verhindern leere oder unverständliche Karten.
+         */
+        if (TextUtils.isEmpty(name)) {
+            name = "Unbenanntes Dokument";
+        }
+
+        if (TextUtils.isEmpty(category)) {
+            category = "Ohne Kategorie";
+        }
+
+        if (TextUtils.isEmpty(expiryDate)
+                && expiryDateMillis > 0) {
+
+            expiryDate =
+                    DocumentDateUtils.formatDate(
+                            expiryDateMillis
+                    );
+        }
+
+        if (TextUtils.isEmpty(expiryDate)) {
+            expiryDate = "Kein Datum";
+        }
+
+        if (TextUtils.isEmpty(note)) {
+            note = "";
+        }
+
+        /*
+         * Status und Farbe anhand des Ablaufdatums berechnen.
+         */
+        String statusText =
+                DocumentDateUtils.getStatusText(
+                        expiryDateMillis
+                );
+
+        int statusColorResource =
+                DocumentDateUtils
+                        .getStatusColorResource(
+                                expiryDateMillis
+                        );
+
+        int statusColor =
+                ContextCompat.getColor(
+                        this,
+                        statusColorResource
+                );
+
+        /*
+         * Berechnete Werte in der Karte anzeigen.
+         */
+        textItemName.setText(name);
+        textItemStatus.setText(statusText);
+
+        textItemCategory.setText(
+                "Kategorie: " + category
         );
 
-        documentView.setTextSize(18);
-        documentView.setPadding(24, 24, 24, 24);
-        documentView.setBackgroundColor(Color.rgb(238, 238, 238));
-
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+        textItemDate.setText(
+                "Ablaufdatum: " + expiryDate
         );
 
-        layoutParams.setMargins(0, 0, 0, 16);
-        documentView.setLayoutParams(layoutParams);
+        /*
+         * Hintergrund des Statusfeldes entsprechend der Dringlichkeit färben.
+         */
+        Drawable statusBackground =
+                textItemStatus.getBackground();
 
-        documentView.setOnClickListener(view -> {
-            Intent intent = new Intent(DashboardActivity.this, DetailActivity.class);
-            intent.putExtra("documentId", documentId);
-            intent.putExtra("documentName", name);
-            intent.putExtra("documentCategory", category);
-            intent.putExtra("documentDate", expiryDate);
-            intent.putExtra("documentNote", note);
+        if (statusBackground != null) {
+            statusBackground
+                    .mutate()
+                    .setTint(statusColor);
+        }
+
+        /*
+         * Auch der Kartenrand erhält die Statusfarbe.
+         */
+        cardDocument.setStrokeColor(
+                statusColor
+        );
+
+        /*
+         * Finale Variablen werden für den Klick-Listener benötigt.
+         */
+        String finalName = name;
+        String finalCategory = category;
+        String finalExpiryDate = expiryDate;
+        String finalNote = note;
+
+        long finalExpiryDateMillis =
+                expiryDateMillis;
+
+        /*
+         * Beim Klick öffnet sich die Detailansicht.
+         * Die Daten werden als Intent-Extras übergeben.
+         */
+        cardDocument.setOnClickListener(view -> {
+            Intent intent = new Intent(
+                    DashboardActivity.this,
+                    DetailActivity.class
+            );
+
+            intent.putExtra(
+                    "documentId",
+                    documentId
+            );
+
+            intent.putExtra(
+                    "documentName",
+                    finalName
+            );
+
+            intent.putExtra(
+                    "documentCategory",
+                    finalCategory
+            );
+
+            intent.putExtra(
+                    "documentDate",
+                    finalExpiryDate
+            );
+
+            intent.putExtra(
+                    "documentDateMillis",
+                    finalExpiryDateMillis
+            );
+
+            intent.putExtra(
+                    "documentNote",
+                    finalNote
+            );
+
             startActivity(intent);
         });
 
-        layoutDocumentList.addView(documentView);
+        /*
+         * Die fertige Karte wird unten an die Dokumentliste angehängt.
+         */
+        layoutDocumentList.addView(itemView);
+    }
+
+    /*
+     * Liest den neuen Zeitstempel aus Firestore.
+     *
+     * Bei älteren Dokumenten ohne Zeitstempel wird stattdessen
+     * das gespeicherte Textdatum umgewandelt.
+     */
+    private long readExpiryDateMillis(
+            QueryDocumentSnapshot snapshot
+    ) {
+        Object storedMillis =
+                snapshot.get("expiryDateMillis");
+
+        if (storedMillis instanceof Number) {
+            return ((Number) storedMillis)
+                    .longValue();
+        }
+
+        return DocumentDateUtils.parseDateToMillis(
+                snapshot.getString("expiryDate")
+        );
+    }
+
+    /*
+     * Liefert den Wert für die Sortierung.
+     *
+     * Dokumente ohne gültiges Datum erhalten Long.MAX_VALUE
+     * und erscheinen dadurch am Ende der Liste.
+     */
+    private long getSortValue(
+            QueryDocumentSnapshot snapshot
+    ) {
+        long expiryDateMillis =
+                readExpiryDateMillis(snapshot);
+
+        if (expiryDateMillis <= 0) {
+            return Long.MAX_VALUE;
+        }
+
+        return expiryDateMillis;
     }
 }

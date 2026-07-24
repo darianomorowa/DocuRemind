@@ -135,7 +135,24 @@ public class SettingsActivity extends AppCompatActivity {
                 notificationsEnabled,
                 reminderDays
         );
+        
+        /*
+         * Nach dem Speichern wird WorkManager
+         * passend zur neuen Einstellung aktualisiert.
+         */
+        ReminderScheduler.updateSchedule(this);
 
+        /*
+         * Wird der Schalter aktiviert, fordert DocuRemind
+         * bei Bedarf die Android-Benachrichtigungsberechtigung an.
+         */
+        if (notificationsEnabled) {
+            NotificationHelper
+                    .createNotificationChannel(this);
+
+            NotificationHelper
+                    .requestPermissionIfNeeded(this);
+        }
         /*
          * Der Bestätigungstext unterscheidet zwischen
          * aktivierten und deaktivierten Erinnerungen.

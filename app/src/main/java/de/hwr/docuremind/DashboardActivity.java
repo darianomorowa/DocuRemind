@@ -127,6 +127,19 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     /*
+     * Prüft bei jedem Öffnen des Dashboards,
+     * ob weiterhin ein Nutzer angemeldet ist.
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (firebaseAuth.getCurrentUser() == null) {
+            openLoginScreen();
+        }
+    }
+
+    /*
      * onResume wird jedes Mal ausgeführt, wenn das Dashboard sichtbar wird.
      *
      * Dadurch wird die Liste nach dem Hinzufügen, Bearbeiten oder Löschen
@@ -136,29 +149,38 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadDocuments();
+
+        if (firebaseAuth.getCurrentUser() != null) {
+            loadDocuments();
     }
 
-    /*
-     * Meldet den Nutzer bei Firebase ab und öffnet den Login-Screen.
-     *
-     * Der bisherige Activity-Stack wird gelöscht, damit der Nutzer nicht
-     * über den Zurück-Button wieder ins Dashboard gelangt.
-     */
-    private void logoutUser() {
-        firebaseAuth.signOut();
+        /*
+         * Meldet den Nutzer bei Firebase ab
+         * und öffnet anschließend den Login-Screen.
+         */
+        private void logoutUser() {
+            firebaseAuth.signOut();
+            openLoginScreen();
+        }
 
-        Intent intent = new Intent(
-                DashboardActivity.this,
-                MainActivity.class
-        );
+        /*
+         * Öffnet den Login-Screen und entfernt alle bisherigen
+         * Activities aus dem Navigationsverlauf.
+         */
+        private void openLoginScreen() {
+            Intent intent = new Intent(
+                    DashboardActivity.this,
+                    MainActivity.class
+            );
 
-        intent.addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
-        );
+            intent.addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK
+                            | Intent.FLAG_ACTIVITY_CLEAR_TASK
+            );
 
-        startActivity(intent);
-    }
+            startActivity(intent);
+            finish();
+        }
 
     /*
      * Lädt alle Dokumente des aktuell angemeldeten Nutzers aus Firestore.

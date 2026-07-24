@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
     }
-    
+
     private void loginUser() {
         String email = editEmail.getText().toString().trim();
         String password = editPassword.getText().toString().trim();

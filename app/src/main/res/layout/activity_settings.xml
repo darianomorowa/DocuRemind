@@ -1,62 +1,257 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<!--
+    Der ScrollView sorgt dafür, dass die Einstellungen
+    auch auf kleineren Displays vollständig erreichbar bleiben.
+-->
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:background="@color/docu_background"
+    android:fillViewport="true">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Einstellungen"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="24dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Erinnerung vor Ablauf"
-        android:textSize="18sp"
-        android:layout_marginBottom="12dp" />
-
-    <RadioGroup
-        android:id="@+id/radioReminderGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <RadioButton
-            android:id="@+id/radio30"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="30 Tage vorher" />
-
-        <RadioButton
-            android:id="@+id/radio60"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="60 Tage vorher" />
-
-        <RadioButton
-            android:id="@+id/radio90"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="90 Tage vorher" />
-
-    </RadioGroup>
-
-    <Button
-        android:id="@+id/buttonSaveSettings"
+    <!-- Hauptcontainer des Einstellungs-Screens -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Einstellungen speichern"
-        android:layout_marginTop="24dp" />
+        android:orientation="vertical"
+        android:padding="20dp">
 
-    <Button
-        android:id="@+id/buttonBackSettings"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Zurück"
-        android:layout_marginTop="8dp" />
+        <!-- Markenname und Überschrift -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DocuRemind"
+            android:textColor="@color/docu_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Erinnerungen"
+            android:textColor="@color/docu_text_primary"
+            android:textSize="29sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:text="Lege fest, wann DocuRemind dich erstmals auf eine bevorstehende Frist hinweist."
+            android:textColor="@color/docu_text_secondary"
+            android:textSize="15sp" />
+
+        <!--
+            Hauptschalter für Benachrichtigungen.
+            Die dauerhafte Speicherung wird im nächsten Java-Schritt ergänzt.
+        -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="@color/docu_surface"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/docu_border"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="18dp">
+
+                <!-- Erklärung des Schalters -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Erinnerungen aktivieren"
+                        android:textColor="@color/docu_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="DocuRemind prüft deine Fristen regelmäßig im Hintergrund."
+                        android:textColor="@color/docu_text_secondary"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switchNotifications"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Auswahl des ersten Erinnerungszeitpunkts -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="@color/docu_surface"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/docu_border"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Erste Erinnerung"
+                    android:textColor="@color/docu_text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Wähle aus, wie früh du erstmals informiert werden möchtest."
+                    android:textColor="@color/docu_text_secondary"
+                    android:textSize="14sp" />
+
+                <!--
+                    Innerhalb einer RadioGroup kann immer nur
+                    eine der drei Optionen ausgewählt werden.
+                -->
+                <RadioGroup
+                    android:id="@+id/radioReminderGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp">
+
+                    <RadioButton
+                        android:id="@+id/radio30"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:text="30 Tage vorher"
+                        android:textColor="@color/docu_text_primary"
+                        android:textSize="16sp" />
+
+                    <RadioButton
+                        android:id="@+id/radio60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:text="60 Tage vorher"
+                        android:textColor="@color/docu_text_primary"
+                        android:textSize="16sp" />
+
+                    <RadioButton
+                        android:id="@+id/radio90"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:text="90 Tage vorher"
+                        android:textColor="@color/docu_text_primary"
+                        android:textSize="16sp" />
+
+                </RadioGroup>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Erklärung der automatischen Folgeerinnerungen -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="@color/docu_surface"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/docu_border"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Zusätzliche Hinweise"
+                    android:textColor="@color/docu_text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="9dp"
+                    android:text="Nach der ersten Erinnerung informiert dich DocuRemind zusätzlich 14, 7, 3 und 1 Tag vor Ablauf sowie am Ablaufdatum."
+                    android:textColor="@color/docu_text_secondary"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Bereits abgelaufene Dokumente werden anschließend einmal pro Woche erneut gemeldet."
+                    android:textColor="@color/docu_text_secondary"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Speichert die gewählten Einstellungen -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonSaveSettings"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="22dp"
+            android:backgroundTint="@color/docu_primary"
+            android:text="Einstellungen speichern"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            app:cornerRadius="14dp" />
+
+        <!-- Kehrt ohne weitere Aktion zum Dashboard zurück -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonBackSettings"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="@color/docu_surface"
+            android:text="Zurück zum Dashboard"
+            android:textAllCaps="false"
+            android:textColor="@color/docu_text_secondary"
+            app:cornerRadius="14dp"
+            app:strokeColor="@color/docu_border"
+            app:strokeWidth="1dp" />
+
+    </LinearLayout>
+
+</ScrollView>

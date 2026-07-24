@@ -130,12 +130,57 @@ public class SettingsActivity extends AppCompatActivity {
         int reminderDays =
                 getSelectedReminderDays();
 
+        /*
+         * Hauptschalter und Erinnerungszeitpunkt
+         * dauerhaft in SharedPreferences speichern.
+         */
         ReminderPreferences.saveSettings(
                 this,
                 notificationsEnabled,
                 reminderDays
         );
-        
+
+        /*
+         * WorkManager passend zur neuen Einstellung aktualisieren.
+         *
+         * Aktiviert:
+         * Der tägliche Fristencheck wird geplant.
+         *
+         * Deaktiviert:
+         * Der tägliche Fristencheck wird beendet.
+         */
+        ReminderScheduler.updateSchedule(this);
+
+        /*
+         * Bei aktivierten Erinnerungen wird der
+         * Benachrichtigungskanal vorbereitet und bei Bedarf
+         * die Android-Berechtigung angefragt.
+         */
+        if (notificationsEnabled) {
+            NotificationHelper.createNotificationChannel(this);
+            NotificationHelper.requestPermissionIfNeeded(this);
+        }
+
+        /*
+         * Dem Nutzer eine verständliche Bestätigung anzeigen.
+         */
+        if (notificationsEnabled) {
+            Toast.makeText(
+                    this,
+                    "Erinnerungen starten "
+                            + reminderDays
+                            + " Tage vor Ablauf",
+                    Toast.LENGTH_SHORT
+            ).show();
+        } else {
+            Toast.makeText(
+                    this,
+                    "Erinnerungen wurden deaktiviert",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
+    }
+
         /*
          * Nach dem Speichern wird WorkManager
          * passend zur neuen Einstellung aktualisiert.

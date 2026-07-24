@@ -39,6 +39,38 @@ public class MainActivity extends AppCompatActivity {
         buttonRegister.setOnClickListener(view -> registerUser());
     }
 
+    /*
+     * Diese Methode wird aufgerufen, wenn der Login-Screen sichtbar wird.
+     *
+     * Ist bereits ein Firebase-Nutzer angemeldet,
+     * wird der Login übersprungen und direkt das Dashboard geöffnet.
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (firebaseAuth.getCurrentUser() != null) {
+            Intent intent = new Intent(
+                    MainActivity.this,
+                    DashboardActivity.class
+            );
+
+            /*
+             * Der Login-Screen wird aus dem bisherigen Verlauf entfernt.
+             *
+             * Dadurch gelangt der Nutzer über die Zurück-Taste
+             * nicht wieder zum Login.
+             */
+            intent.addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK
+                            | Intent.FLAG_ACTIVITY_CLEAR_TASK
+            );
+
+            startActivity(intent);
+            finish();
+        }
+    }
+    
     private void loginUser() {
         String email = editEmail.getText().toString().trim();
         String password = editPassword.getText().toString().trim();

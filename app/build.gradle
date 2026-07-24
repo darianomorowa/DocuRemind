@@ -36,6 +36,9 @@ android {
 dependencies {
     implementation platform('com.google.firebase:firebase-bom:34.15.0')
 
+    // Führt den täglichen Fristencheck im Hintergrund aus.
+    implementation 'androidx.work:work-runtime:2.11.2'
+
     implementation libs.activity.ktx
     implementation libs.appcompat
     implementation libs.constraintlayout

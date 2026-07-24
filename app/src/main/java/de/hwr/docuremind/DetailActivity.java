@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.ActivityNotFoundException;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -442,10 +443,8 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     /*
-     * Öffnet eine installierte Kalender-App mit vorausgefüllten Daten.
-     *
-     * Der Nutzer bestätigt dort selbst, ob der Termin
-     * tatsächlich gespeichert werden soll.
+     * Öffnet eine installierte Kalender-App
+     * mit den vorausgefüllten Dokumentdaten.
      */
     private void addDocumentToCalendar() {
         if (expiryDateMillis <= 0) {
@@ -459,8 +458,8 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         /*
-         * Impliziter Intent:
-         * Android sucht eine geeignete Kalender-App.
+         * ACTION_INSERT öffnet den Bildschirm zum Erstellen
+         * eines neuen Kalendertermins.
          */
         Intent calendarIntent =
                 new Intent(Intent.ACTION_INSERT);
@@ -470,7 +469,7 @@ public class DetailActivity extends AppCompatActivity {
         );
 
         /*
-         * Vorausgefüllte Daten für den Kalendertermin.
+         * Dokumentinformationen für den Termin vorausfüllen.
          */
         calendarIntent.putExtra(
                 CalendarContract.Events.TITLE,
@@ -499,19 +498,18 @@ public class DetailActivity extends AppCompatActivity {
         );
 
         /*
-         * Vor dem Start wird geprüft, ob das Gerät
-         * eine passende Kalender-App besitzt.
+         * Intent direkt starten.
+         *
+         * Falls tatsächlich keine Kalender-App installiert ist,
+         * wird die Exception abgefangen.
          */
-        if (calendarIntent.resolveActivity(
-                getPackageManager()
-        ) != null) {
-
+        try {
             startActivity(calendarIntent);
 
-        } else {
+        } catch (ActivityNotFoundException exception) {
             Toast.makeText(
                     this,
-                    "Keine Kalender-App gefunden",
+                    "Keine Kalender-App installiert",
                     Toast.LENGTH_SHORT
             ).show();
         }

@@ -251,8 +251,8 @@ public class AddDocumentActivity extends AppCompatActivity {
     }
 
     /*
-     * Liest alle Eingaben aus und entscheidet anschließend,
-     * ob ein neues Dokument erstellt oder ein bestehendes aktualisiert wird.
+     * Liest alle Eingaben aus und startet anschließend
+     * das Erstellen oder Aktualisieren des Dokuments.
      */
     private void saveDocument() {
         String name =
@@ -281,15 +281,17 @@ public class AddDocumentActivity extends AppCompatActivity {
         }
 
         /*
-         * Ohne eingeloggten Nutzer dürfen keine Daten gespeichert werden.
+         * Ohne angemeldeten Nutzer kann Firestore
+         * kein persönliches Dokument speichern.
          */
         if (firebaseAuth.getCurrentUser() == null) {
             Toast.makeText(
                     this,
-                    "Kein Nutzer eingeloggt",
-                    Toast.LENGTH_SHORT
+                    "Deine Anmeldung ist nicht mehr aktiv",
+                    Toast.LENGTH_LONG
             ).show();
 
+            finish();
             return;
         }
 
@@ -304,7 +306,7 @@ public class AddDocumentActivity extends AppCompatActivity {
                 );
 
         /*
-         * Eine Map fasst alle Dokumentdaten für Firestore zusammen.
+         * Alle Dokumentinformationen für Firestore zusammenstellen.
          */
         Map<String, Object> document =
                 new HashMap<>();
@@ -326,8 +328,10 @@ public class AddDocumentActivity extends AppCompatActivity {
         );
 
         /*
-         * Abhängig vom Modus wird create oder update verwendet.
+         * Eingaben und Buttons während der Speicherung sperren.
          */
+        setSavingState(true);
+
         if (isEditMode) {
             updateDocument(userId, document);
         } else {
@@ -336,8 +340,7 @@ public class AddDocumentActivity extends AppCompatActivity {
     }
 
     /*
-     * Speichert ein komplett neues Dokument in Firestore.
-     * Firestore erzeugt automatisch eine neue Dokument-ID.
+     * Speichert ein neues Dokument in Firestore.
      */
     private void createDocument(
             String userId,
@@ -352,34 +355,32 @@ public class AddDocumentActivity extends AppCompatActivity {
                 .document(userId)
                 .collection("documents")
                 .add(document)
-                .addOnSuccessListener(
-                        documentReference -> {
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(
+                            AddDocumentActivity.this,
+                            "Dokument gespeichert",
+                            Toast.LENGTH_SHORT
+                    ).show();
 
-                            Toast.makeText(
-                                    AddDocumentActivity.this,
-                                    "Dokument gespeichert",
-                                    Toast.LENGTH_SHORT
-                            ).show();
+                    finish();
+                })
+                .addOnFailureListener(exception -> {
+                    /*
+                     * Nach einem Fehler wird das Formular
+                     * wieder vollständig bedienbar.
+                     */
+                    setSavingState(false);
 
-                            finish();
-                        }
-                )
-                .addOnFailureListener(
-                        exception -> {
-
-                            Toast.makeText(
-                                    AddDocumentActivity.this,
-                                    "Fehler beim Speichern: "
-                                            + exception.getMessage(),
-                                    Toast.LENGTH_LONG
-                            ).show();
-                        }
-                );
+                    Toast.makeText(
+                            AddDocumentActivity.this,
+                            "Dokument konnte nicht gespeichert werden. Bitte Verbindung prüfen.",
+                            Toast.LENGTH_LONG
+                    ).show();
+                });
     }
 
     /*
-     * Aktualisiert ein bereits bestehendes Firestore-Dokument.
-     * Dazu wird die vorhandene documentId verwendet.
+     * Aktualisiert ein bereits vorhandenes Firestore-Dokument.
      */
     private void updateDocument(
             String userId,
@@ -390,45 +391,90 @@ public class AddDocumentActivity extends AppCompatActivity {
                 .collection("documents")
                 .document(documentId)
                 .update(document)
-                .addOnSuccessListener(
-                        unused -> {
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(
+                            AddDocumentActivity.this,
+                            "Dokument aktualisiert",
+                            Toast.LENGTH_SHORT
+                    ).show();
 
-                            Toast.makeText(
-                                    AddDocumentActivity.this,
-                                    "Dokument aktualisiert",
-                                    Toast.LENGTH_SHORT
-                            ).show();
+                    finish();
+                })
+                .addOnFailureListener(exception -> {
+                    /*
+                     * Nach einem Fehler werden die Eingaben
+                     * und Buttons wieder freigegeben.
+                     */
+                    setSavingState(false);
 
-                            finish();
-                        }
-                )
-                .addOnFailureListener(
-                        exception -> {
+                    Toast.makeText(
+                            AddDocumentActivity.this,
+                            "Dokument konnte nicht aktualisiert werden. Bitte Verbindung prüfen.",
+                            Toast.LENGTH_LONG
+                    ).show();
+                });
+    }
+    /*
+     * Steuert den sichtbaren Zustand während der Firestore-Speicherung.
+     *
+     * Dadurch können keine doppelten Dokumente durch
+     * mehrfaches Antippen des Speichern-Buttons entstehen.
+     */
+    private void setSavingState(
+            boolean saving
+    ) {
+        editDocumentName.setEnabled(!saving);
+        editCategory.setEnabled(!saving);
+        editExpiryDate.setEnabled(!saving);
+        editNote.setEnabled(!saving);
 
-                            Toast.makeText(
-                                    AddDocumentActivity.this,
-                                    "Fehler beim Aktualisieren: "
-                                            + exception.getMessage(),
-                                    Toast.LENGTH_LONG
-                            ).show();
-                        }
+        buttonSaveDocument.setEnabled(!saving);
+        buttonBack.setEnabled(!saving);
+
+        if (saving) {
+            if (isEditMode) {
+                buttonSaveDocument.setText(
+                        "Änderungen werden gespeichert..."
                 );
+            } else {
+                buttonSaveDocument.setText(
+                        "Dokument wird gespeichert..."
+                );
+            }
+
+            return;
+        }
+
+        if (isEditMode) {
+            buttonSaveDocument.setText(
+                    "Änderungen speichern"
+            );
+        } else {
+            buttonSaveDocument.setText(
+                    "Dokument speichern"
+            );
+        }
     }
 
     /*
      * Prüft die Pflichtfelder des Formulars.
      *
-     * Bei einem Fehler wird direkt am betroffenen Feld eine Meldung gezeigt.
+     * Alte Fehlermeldungen werden vor jeder neuen Prüfung entfernt.
      */
     private boolean isInputValid(
             String name,
             String category
     ) {
+        editDocumentName.setError(null);
+        editCategory.setError(null);
+        editExpiryDate.setError(null);
+
         if (TextUtils.isEmpty(name)) {
             editDocumentName.setError(
                     "Bitte Dokumentname eingeben"
             );
 
+            editDocumentName.requestFocus();
             return false;
         }
 
@@ -437,6 +483,7 @@ public class AddDocumentActivity extends AppCompatActivity {
                     "Bitte Kategorie eingeben"
             );
 
+            editCategory.requestFocus();
             return false;
         }
 
@@ -445,6 +492,7 @@ public class AddDocumentActivity extends AppCompatActivity {
                     "Bitte Ablaufdatum auswählen"
             );
 
+            editExpiryDate.requestFocus();
             return false;
         }
 

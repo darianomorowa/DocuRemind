@@ -181,44 +181,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-        /*
-         * Nach dem Speichern wird WorkManager
-         * passend zur neuen Einstellung aktualisiert.
-         */
-        ReminderScheduler.updateSchedule(this);
-
-        /*
-         * Wird der Schalter aktiviert, fordert DocuRemind
-         * bei Bedarf die Android-Benachrichtigungsberechtigung an.
-         */
-        if (notificationsEnabled) {
-            NotificationHelper
-                    .createNotificationChannel(this);
-
-            NotificationHelper
-                    .requestPermissionIfNeeded(this);
-        }
-        /*
-         * Der Bestätigungstext unterscheidet zwischen
-         * aktivierten und deaktivierten Erinnerungen.
-         */
-        if (notificationsEnabled) {
-            Toast.makeText(
-                    this,
-                    "Erinnerungen starten "
-                            + reminderDays
-                            + " Tage vor Ablauf",
-                    Toast.LENGTH_SHORT
-            ).show();
-        } else {
-            Toast.makeText(
-                    this,
-                    "Erinnerungen wurden deaktiviert",
-                    Toast.LENGTH_SHORT
-            ).show();
-        }
-    }
-
     /*
      * Übersetzt den ausgewählten RadioButton
      * in den Zahlenwert 30, 60 oder 90.

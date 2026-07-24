@@ -1,64 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
+<!--
+    Dieser ScrollView sorgt dafür, dass das Formular auch auf kleineren
+    Displays vollständig erreichbar bleibt.
+-->
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/docu_background"
+    android:fillViewport="true">
+
+    <!-- Hauptcontainer des Formulars -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="22dp">
 
+        <!-- Überschrift des Screens -->
         <TextView
+            android:id="@+id/textAddDocumentTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Dokument hinzufügen"
+            android:textColor="@color/docu_text_primary"
             android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp" />
+            android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/editDocumentName"
+        <!-- Kurze Erklärung für den Nutzer -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="24dp"
+            android:text="Hinterlege die wichtigsten Informationen zur Frist."
+            android:textColor="@color/docu_text_secondary"
+            android:textSize="15sp" />
+
+        <!-- Eingabefeld für den Dokumentnamen -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Dokumentname"
-            android:layout_marginBottom="12dp" />
+            app:boxBackgroundColor="@color/docu_surface"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusTopStart="14dp">
 
-        <EditText
-            android:id="@+id/editCategory"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editDocumentName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Eingabefeld für die Dokumentkategorie -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
             android:hint="Kategorie"
-            android:layout_marginBottom="12dp" />
+            app:boxBackgroundColor="@color/docu_surface"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusTopStart="14dp">
 
-        <EditText
-            android:id="@+id/editExpiryDate"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!--
+            Das Ablaufdatum wird nicht über die Tastatur eingegeben.
+            Beim Antippen öffnet Java später einen DatePicker.
+        -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Ablaufdatum, z.B. 31.12.2026"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginTop="14dp"
+            android:hint="Ablaufdatum"
+            app:boxBackgroundColor="@color/docu_surface"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusTopStart="14dp"
+            app:helperText="Antippen und Datum auswählen">
 
-        <EditText
-            android:id="@+id/editNote"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editExpiryDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:cursorVisible="false"
+                android:focusable="false"
+                android:hint="TT.MM.JJJJ"
+                android:longClickable="false" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Mehrzeiliges Feld für zusätzliche Informationen -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
             android:hint="Notiz"
-            android:minLines="3"
-            android:gravity="top"
-            android:layout_marginBottom="20dp" />
+            app:boxBackgroundColor="@color/docu_surface"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusTopStart="14dp">
 
-        <Button
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:inputType="textMultiLine|textCapSentences"
+                android:minLines="4" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Primärer Button zum Speichern -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonSaveDocument"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Speichern" />
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/docu_primary"
+            android:text="Dokument speichern"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            app:cornerRadius="14dp" />
 
-        <Button
+        <!-- Sekundärer Button zum Abbrechen -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonBack"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Zurück"
-            android:layout_marginTop="8dp" />
+            android:layout_height="52dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/docu_surface"
+            android:text="Abbrechen"
+            android:textAllCaps="false"
+            android:textColor="@color/docu_primary"
+            app:cornerRadius="14dp"
+            app:strokeColor="@color/docu_border"
+            app:strokeWidth="1dp" />
 
     </LinearLayout>
+
 </ScrollView>

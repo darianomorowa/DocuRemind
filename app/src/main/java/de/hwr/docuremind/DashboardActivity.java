@@ -79,6 +79,28 @@ public class DashboardActivity extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
 
         /*
+         * Den Benachrichtigungskanal für DocuRemind vorbereiten.
+         */
+        NotificationHelper.createNotificationChannel(this);
+
+        /*
+         * Bei aktivierten Erinnerungen wird bei Bedarf
+         * die Android-Berechtigung angefragt.
+         */
+        if (ReminderPreferences
+                .areNotificationsEnabled(this)) {
+
+            NotificationHelper
+                    .requestPermissionIfNeeded(this);
+        }
+
+        /*
+         * WorkManager passend zur aktuellen Einstellung
+         * starten oder beenden.
+         */
+        ReminderScheduler.updateSchedule(this);
+
+        /*
          * Navigation zu den weiteren Activities.
          */
         buttonAddDocument.setOnClickListener(view -> {

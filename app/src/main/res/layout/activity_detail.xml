@@ -1,74 +1,286 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
+<!--
+    Der ScrollView stellt sicher, dass alle Dokumentinformationen
+    auch auf kleineren Displays erreichbar bleiben.
+-->
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/docu_background"
+    android:fillViewport="true">
+
+    <!-- Hauptcontainer der Dokumentdetailseite -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="20dp">
 
+        <!-- Markenname als kleine Orientierung -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DocuRemind"
+            android:textColor="@color/docu_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- Hauptüberschrift des Screens -->
         <TextView
             android:id="@+id/textDetailTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:text="Dokumentdetails"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp" />
+            android:textColor="@color/docu_text_primary"
+            android:textSize="29sp"
+            android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/textDocumentName"
+        <!--
+            Statuskarte:
+            Zeigt später Resttage und Dringlichkeit des Dokuments.
+        -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Name"
-            android:textSize="20sp"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginTop="22dp"
+            app:cardBackgroundColor="@color/docu_surface"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/docu_border"
+            app:strokeWidth="1dp">
 
-        <TextView
-            android:id="@+id/textDocumentCategory"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="18dp">
+
+                <!-- Kurze Beschriftung der Statuskarte -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fristenstatus"
+                        android:textColor="@color/docu_text_secondary"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/textDetailDays"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Ablaufdatum wird geprüft"
+                        android:textColor="@color/docu_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!--
+                    Die Farbe dieses Statusfeldes wird später in Java
+                    abhängig von der Dringlichkeit gesetzt.
+                -->
+                <TextView
+                    android:id="@+id/textDetailStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_status_pill"
+                    android:paddingLeft="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingRight="12dp"
+                    android:paddingBottom="6dp"
+                    android:text="Status"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!--
+            Informationskarte mit den zentralen Dokumentdaten.
+        -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Kategorie"
-            android:textSize="18sp"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="@color/docu_surface"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/docu_border"
+            app:strokeWidth="1dp">
 
-        <TextView
-            android:id="@+id/textDocumentDate"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Name des Dokuments -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dokument"
+                    android:textColor="@color/docu_text_secondary"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/textDocumentName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Reisepass"
+                    android:textColor="@color/docu_text_primary"
+                    android:textSize="21sp"
+                    android:textStyle="bold" />
+
+                <!-- Kategorie des Dokuments -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Kategorie"
+                    android:textColor="@color/docu_text_secondary"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/textDocumentCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Ausweis"
+                    android:textColor="@color/docu_text_primary"
+                    android:textSize="17sp" />
+
+                <!-- Ablaufdatum des Dokuments -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Ablaufdatum"
+                    android:textColor="@color/docu_text_secondary"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/textDocumentDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="31.12.2026"
+                    android:textColor="@color/docu_text_primary"
+                    android:textSize="17sp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Separate Karte für längere Notizen -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ablaufdatum"
-            android:textSize="18sp"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="@color/docu_surface"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="2dp"
+            app:strokeColor="@color/docu_border"
+            app:strokeWidth="1dp">
 
-        <TextView
-            android:id="@+id/textDocumentNote"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Notiz"
-            android:textSize="18sp"
-            android:layout_marginBottom="24dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-        <Button
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Notiz"
+                    android:textColor="@color/docu_text_secondary"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/textDocumentNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:minHeight="48dp"
+                    android:text="Keine Notiz hinterlegt."
+                    android:textColor="@color/docu_text_primary"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Primäre Aktion: Dokument bearbeiten -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonEdit"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Bearbeiten" />
+            android:layout_height="56dp"
+            android:layout_marginTop="22dp"
+            android:backgroundTint="@color/docu_primary"
+            android:text="Dokument bearbeiten"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            app:cornerRadius="14dp" />
 
-        <Button
+        <!--
+            Kalenderexport:
+            Die Funktion wird im nächsten Java-Schritt implementiert.
+        -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonCalendar"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/docu_surface"
+            android:text="Zum Kalender hinzufügen"
+            android:textAllCaps="false"
+            android:textColor="@color/docu_primary"
+            app:cornerRadius="14dp"
+            app:strokeColor="@color/docu_primary"
+            app:strokeWidth="1dp" />
+
+        <!-- Gefährliche Aktion bewusst optisch zurückhaltend darstellen -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonDelete"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Löschen"
-            android:layout_marginTop="8dp" />
+            android:layout_height="52dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/docu_surface"
+            android:text="Dokument löschen"
+            android:textAllCaps="false"
+            android:textColor="@color/docu_danger"
+            app:cornerRadius="14dp"
+            app:strokeColor="@color/docu_danger"
+            app:strokeWidth="1dp" />
 
-        <Button
+        <!-- Schließt die aktuelle Activity ohne Änderungen -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonBackDetail"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Zurück"
-            android:layout_marginTop="8dp" />
+            android:layout_height="52dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="@color/docu_surface"
+            android:text="Zurück zum Dashboard"
+            android:textAllCaps="false"
+            android:textColor="@color/docu_text_secondary"
+            app:cornerRadius="14dp"
+            app:strokeColor="@color/docu_border"
+            app:strokeWidth="1dp" />
 
     </LinearLayout>
+
 </ScrollView>

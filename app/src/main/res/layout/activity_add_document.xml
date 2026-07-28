@@ -104,7 +104,7 @@
                 android:clickable="true"
                 android:cursorVisible="false"
                 android:focusable="false"
-                android:hint="TT.MM.JJJJ"
+
                 android:longClickable="false" />
 
         </com.google.android.material.textfield.TextInputLayout>

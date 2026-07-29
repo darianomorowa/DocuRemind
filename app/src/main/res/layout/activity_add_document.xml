@@ -104,7 +104,6 @@
                 android:clickable="true"
                 android:cursorVisible="false"
                 android:focusable="false"
-
                 android:longClickable="false" />
 
         </com.google.android.material.textfield.TextInputLayout>
